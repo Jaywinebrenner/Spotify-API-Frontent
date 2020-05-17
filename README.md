@@ -1,3 +1,12 @@
+
+Current deployed heroku url
+https://spotify-frontend-party.herokuapp.com/
+
+
+
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

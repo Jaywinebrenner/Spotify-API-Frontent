@@ -137,6 +137,7 @@ function App(props) {
     >
       {serverData.user ? (
         <div>
+          <h1>This is a Heroku Test</h1>
           <h1>{serverData.user.name}'s playlist</h1>
           <PlaylistCounter playlists={playlistToRender} />
           <HoursCounter playlists={playlistToRender} />

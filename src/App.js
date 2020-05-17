@@ -4,6 +4,7 @@ import './App.css';
 import PersonList from './components/PersonList'
 import PersonInput from './components/PersonInput';
 import Home from "./components/Home";
+import queryString from 'query-string'
 
 let defaultTextColor = "#C83616";
 let defaultStyle = {
@@ -24,40 +25,7 @@ let fakeServerData = {
           {name:"Powerful Ninja", duration: 1234},
           {name:"Too young to cook", duration: 1234},
         ],
-      },
-      {
-        name: "Magical List",
-        songs: [
-          {name:"Turkey", duration: 134},
-          {name:"Chickn", duration: 14},
-          {name:"Upstairs Rat", duration: 164},
-          {name:"Dingo Drippings", duration: 24},
-          {name:"Ken", duration: 14},
-          {name:"Legs", duration: 34},
-        ],
-      },
-      {
-        name: "Pillow List",
-        songs: [
-          {name:"Soft", duration: 124},
-          {name:"Ball", duration: 1},
-          {name:"Too old to cook", duration: 934},
-          {name:"Dingos at Bingos", duration: 934},
-          {name:"Net Ninja", duration: 767},
-          {name:"Flippin burgers", duration: 14},
-        ],
-      },
-      {
-        name: "Bad List",
-        songs: [
-          {name:"Eat cake", duration: 14},
-          {name:"Clam shells", duration: 34},
-          {name:"Neighborhood Bat",duration: 34},
-          {name:"Ringo Starr for lunch", duration: 34},
-          {name:"Unhinged Rap Metal", duration: 14},
-          {name:"Too young to Flip", duration: 14},
-        ],
-      },
+      }
     ],
   },
 };
@@ -108,25 +76,35 @@ const Playlist = (props) => {
   );
 }
 
-function App(props) {
+function App() {
   const [serverData, setServerData] = useState({})
   const [filterString, setFilterString] = useState('')
 
 
   useEffect(() => {
-    setTimeout(()=> {
-    setServerData(fakeServerData)
-    }, 1500)
+
+    //Gets access token from URL
+    let parsed = queryString.parse(window.location.search);
+    console.log("parsed STRING", parsed)
+    let accessToken = parsed.access_token;
+    console.log("ACCESS TOKEN", accessToken)
+
+    fetch('https://api.spotify.com/v1/me', {
+      headers: {'Authorization': 'Bearer ' + accessToken}
+  }).then(res => res.json())
+  .then(data => setServerData({user: data.display_name}))
+  console.log("SERVER DSATA", serverData)
+
   }, []);
 
 
-
-
-
-  let playlistToRender = serverData.user ? serverData.user.playlists
-  .filter(playlist =>
-      playlist.name.toLowerCase()
-      .includes(filterString.toLowerCase())
+  let playlistToRender = 
+    serverData.user && 
+    serverData.user.playlists 
+    ? serverData.user.playlists
+        .filter(playlist =>
+        playlist.name.toLowerCase()
+        .includes(filterString.toLowerCase())
   ) : []
             
 
@@ -144,19 +122,25 @@ function App(props) {
           <Filter
             onTextChange={(text) => {
               setFilterString(text);
-            }}
-          />
+            }} />
 
-          {serverData.user.playlists
+          {playlistToRender.map(playlist =>
+            <Playlist playlist={playlist} />
+          )}
+
+          {/* {serverData.user.playlists
             .filter((playlist) =>
               playlist.name.toLowerCase().includes(filterString.toLowerCase()),
             )
             .map((playlist) => (
               <Playlist playlist={playlist} />
-            ))}
+            ))} */}
         </div>
       ) : (
-        <h1 style={{ ...defaultStyle }}>'Loading...'</h1>
+        <button 
+        style={{marginTop: '50px', borderRadius: 5, padding: '20px', fontSize: '30' }}
+        onClick={()=> window.location = 'http://localhost:8888/login'}
+        >Sign In With Spotify</button>
       )}
     </div>
   );

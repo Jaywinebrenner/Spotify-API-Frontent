@@ -1,7 +1,7 @@
 
 Current deployed heroku url
 https://spotify-frontend-party.herokuapp.com/
-
+ 
 
 
 

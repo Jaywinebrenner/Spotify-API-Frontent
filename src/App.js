@@ -85,15 +85,36 @@ function App() {
 
     //Gets access token from URL
     let parsed = queryString.parse(window.location.search);
-    console.log("parsed STRING", parsed)
     let accessToken = parsed.access_token;
-    console.log("ACCESS TOKEN", accessToken)
 
-    fetch('https://api.spotify.com/v1/me', {
-      headers: {'Authorization': 'Bearer ' + accessToken}
-  }).then(res => res.json())
-  .then(data => setServerData({user: data.display_name}))
-  console.log("SERVER DSATA", serverData)
+
+    fetch("https://api.spotify.com/v1/me", {
+      headers: { Authorization: "Bearer " + accessToken },
+    })
+      .then((res) => res.json())
+      .then((data) =>
+        setServerData({
+          user: {
+            name: data.display_name,
+          },
+        }),
+      );
+
+    fetch("https://api.spotify.com/v1/me/playlists", {
+      headers: { Authorization: "Bearer " + accessToken },
+    })
+      .then((response) => response.json())
+      .then((data) =>
+        setServerData({
+          playlists: data.items.map((item) => {
+            console.log(data.items);
+            return {
+              name: item.name,
+              songs: [],
+            };
+          }),
+        }),
+      );
 
   }, []);
 
@@ -118,7 +139,7 @@ function App() {
           <h1>This is a Heroku Test</h1>
           <h1>{serverData.user.name}'s playlist</h1>
           <PlaylistCounter playlists={playlistToRender} />
-          <HoursCounter playlists={playlistToRender} />
+          {/* <HoursCounter playlists={playlistToRender} /> */}
           <Filter
             onTextChange={(text) => {
               setFilterString(text);
